@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ionic Bonding Assessment — Dot & Cross</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&family=Source+Code+Pro:wght@500;600&display=swap');
+
+:root {
+  --bg: #0f1923;
+  --surface: #162030;
+  --card: #1c2a3a;
+  --border: #2a3f55;
+  --border-bright: #3a5570;
+  --metal-bg: #2a1f00;
+  --metal-border: #e8a020;
+  --metal-text: #ffc040;
+  --non-bg: #001a2a;
+  --non-border: #2090d0;
+  --non-text: #60c8f0;
+  --ion-bg: #0a1a0a;
+  --ion-border: #30c060;
+  --ion-text: #60f080;
+  --dot-color: #ffb830;
+  --cross-color: #40a8e8;
+  --text: #e8f4ff;
+  --subtext: #7090a8;
+  --accent: #ff6b35;
+  --green: #2ecc71;
+  --red: #e74c3c;
+  --yellow: #f1c40f;
+  --shell-metal: rgba(232,160,32,0.15);
+  --shell-non: rgba(32,144,208,0.12);
+  --shell-ion: rgba(48,192,96,0.15);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; user-select:none; }
+
+body {
+  background: var(--bg);
+  font-family: 'Nunito', sans-serif;
+  color: var(--text);
+  min-height: 100vh;
+  background-image:
+    radial-gradient(ellipse at 15% 50%, rgba(14,40,80,0.5) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 30%, rgba(0,60,40,0.3) 0%, transparent 50%);
+}
+
+/* ── Header ── */
+.header {
+  text-align: center;
+  padding: 22px 20px 14px;
+  border-bottom: 1px solid var(--border);
+}
+.header h1 {
+  font-family: 'Fredoka One', sans-serif;
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  letter-spacing: 1px;
+  background: linear-gradient(135deg, #ffc040, #ff6b35, #40a8e8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.header p { color: var(--subtext); font-size: 0.88rem; margin-top: 4px; }
+
+/* ── Compound Tabs ── */
+.compound-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px 20px 10px;
+}
+.ctab {
+  font-family: 'Fredoka One', sans-serif;
+  font-size: 1.1rem;
+  padding: 10px 32px;
+  border-radius: 8px;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  color: var(--subtext);
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.5px;
+}
+.ctab:hover { border-color: var(--border-bright); color: var(--text); }
+.ctab.active {
+  background: linear-gradient(135deg, #1a3a5c, #0f2a40);
+  border-color: var(--metal-border);
+  color: #fff;
+  box-shadow: 0 0 20px rgba(232,160,32,0.25);
+}
+
+/* ── Progress bar ── */
+.progress-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 20px 12px;
+  flex-wrap: wrap;
+}
+.prog-step {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--subtext);
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  transition: all 0.3s;
+}
+.prog-step.active { border-color: var(--metal-border); color: var(--metal-text); background: rgba(232,160,32,0.1); }
+.prog-step.done { border-color: var(--green); color: var(--green); background: rgba(46,204,113,0.1); }
+.prog-step .pnum {
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--border); color: var(--subtext);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.7rem; font-weight: 900; flex-shrink: 0;
+  transition: all 0.3s;
+}
+.prog-step.active .pnum { background: var(--metal-border); color: #000; }
+.prog-step.done .pnum { background: var(--green); color: #fff; content: '✓'; }
+
+/* ── Main canvas ── */
+.canvas-wrap {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 16px 12px;
+}
+
+.question-card {
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 20px 14px;
+  margin-bottom: 12px;
+  position: relative;
+}
+
+.q-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--subtext);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.q-badge {
+  background: var(--metal-border);
+  color: #000;
+  border-radius: 4px;
+  padding: 2px 7px;
+  font-size: 0.7rem;
+  font-family: 'Source Code Pro', monospace;
+}
+
+.question-text {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+.question-text span { color: var(--metal-text); }
+
+/* Atom counter */
+.atom-counter {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.counter-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.counter-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--subtext);
+}
+.counter-label.metal-lbl { color: var(--metal-text); }
+.counter-label.non-lbl { color: var(--non-text); }
+.counter-ctrl {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.counter-btn {
+  width: 34px; height: 34px;
+  background: var(--surface);
+  border: none;
+  color: var(--text);
+  font-size: 1.2rem;
+  font-weight: 900;
+  cursor: pointer;
+  transition: background 0.15s;
+  display: flex; align-items: center; justify-content: center;
+}
+.counter-btn:hover { background: var(--border); }
+.counter-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.counter-val {
+  width: 44px; height: 34px;
+  background: var(--card);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Fredoka One', sans-serif;
+  font-size: 1.3rem;
+  color: var(--text);
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+}
+.counter-hint {
+  font-size: 0.72rem;
+  color: var(--subtext);
+  text-align: center;
+  max-width: 90px;
+}
+.counter-feedback {
+  font-size: 0.8rem;
+  font-weight: 800;
+  padding: 4px 12px;
+  border-radius: 5px;
+  display: none;
+}
+.counter-feedback.correct { background: rgba(46,204,113,0.15); color: var(--green); border: 1px solid var(--green); display: block; }
+.counter-feedback.wrong { background: rgba(231,76,60,0.15); color: var(--red); border: 1px solid var(--red); display: block; }
+
+/* Check button */
+.check-btn {
+  font-family: 'Fredoka One', sans-serif;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+  padding: 9px 22px;
+  border-radius: 7px;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(135deg, #1a5fa0, #0f4080);
+  color: #fff;
+  box-shadow: 0 3px 12px rgba(26,95,160,0.3);
+  transition: all 0.15s;
+  align-self: flex-end;
+  margin-left: auto;
+}
+.check-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 18px rgba(26,95,160,0.4); }
+.check-btn.success { background: linear-gradient(135deg, #2ecc71, #1a8a4a); box-shadow: 0 3px 12px rgba(46,204,113,0.3); }
+
+/* ── Dot & Cross interactive stage ── */
+.dxstage {
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  position: relative;
+  min-height: 320px;
+}
+.dxstage-title {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--subtext);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.dxstage-hint {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--metal-text);
+  letter-spacing: 0;
+  text-transform: none;
+  background: rgba(232,160,32,0.1);
+  padding: 3px 10px;
+  border-radius: 4px;
+  border: 1px solid rgba(232,160,32,0.3);
+}
+
+.atoms-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 8px 0;
+  position: relative;
+}
+
+/* Atom shell */
+.atom-shell {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 2px dashed transparent;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  flex-shrink: 0;
+}
+.atom-shell.metal-atom {
+  background: var(--shell-metal);
+  border-color: var(--metal-border);
+  box-shadow: 0 0 12px rgba(232,160,32,0.15);
+}
+.atom-shell.non-atom {
+  background: var(--shell-non);
+  border-color: var(--non-border);
+  box-shadow: 0 0 12px rgba(32,144,208,0.12);
+}
+.atom-shell.drop-target {
+  border-style: solid;
+  border-color: #fff;
+  box-shadow: 0 0 20px rgba(255,255,255,0.3);
+}
+.atom-shell.correct-shell {
+  border-color: var(--green) !important;
+  box-shadow: 0 0 18px rgba(46,204,113,0.4) !important;
+}
+
+.atom-nucleus {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Fredoka One', sans-serif;
+  font-size: 1.1rem;
+  border-radius: 50%;
+  z-index: 2;
+}
+.metal-atom .atom-nucleus { color: var(--metal-text); }
+.non-atom .atom-nucleus { color: var(--non-text); }
+
+.atom-label-below {
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 800;
+  margin-top: 8px;
+  letter-spacing: 0.5px;
+}
+.metal-lbl-b { color: var(--metal-text); }
+.non-lbl-b { color: var(--non-text); }
+
+/* Electron dots on shells */
+.shell-electron {
+  position: absolute;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  cursor: grab;
+  z-index: 5;
+  transition: transform 0.15s;
+  display: flex; align-items: center; justify-content: center;
+}
+.shell-electron:hover { transform: scale(1.3); }
+.shell-electron:active { cursor: grabbing; }
+.shell-electron.dot-e {
+  background: var(--dot-color);
+  box-shadow: 0 0 6px rgba(255,184,48,0.7);
+}
+.shell-electron.cross-e {
+  background: none;
+}
+.shell-electron.cross-e::before,
+.shell-electron.cross-e::after {
+  content: '';
+  position: absolute;
+  width: 2.5px; height: 11px;
+  background: var(--cross-color);
+  border-radius: 2px;
+}
+.shell-electron.cross-e::before { transform: rotate(45deg); }
+.shell-electron.cross-e::after { transform: rotate(-45deg); }
+.shell-electron.transferred {
+  box-shadow: 0 0 10px rgba(46,204,113,0.8), 0 0 4px rgba(255,184,48,0.5) !important;
+  outline: 1.5px solid var(--green);
+  outline-offset: 2px;
+}
+.shell-electron.dragging {
+  position: fixed;
+  z-index: 1000;
+  cursor: grabbing;
+  transform: scale(1.4);
+  pointer-events: none;
+  box-shadow: 0 0 16px rgba(255,184,48,0.9);
+}
+
+/* Ion bracket overlay */
+.ion-bracket {
+  position: absolute;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.ion-bracket.show { opacity: 1; }
+.ion-bracket-charge {
+  position: absolute;
+  font-family: 'Fredoka One', sans-serif;
+  font-size: 0.85rem;
+  pointer-events: none;
+}
+
+/* Electron tray */
+.electron-tray {
+  background: var(--surface);
+  border: 1.5px dashed var(--metal-border);
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+  display: none;
+}
+.tray-label {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--metal-text);
+  margin-bottom: 10px;
+}
+.tray-electrons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.tray-electron {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--dot-color);
+  box-shadow: 0 0 8px rgba(255,184,48,0.6);
+  cursor: grab;
+  transition: transform 0.15s, box-shadow 0.15s;
+  flex-shrink: 0;
+}
+.tray-electron:hover { transform: scale(1.25); box-shadow: 0 0 14px rgba(255,184,48,0.9); }
+.tray-electron.used { opacity: 0.2; cursor: default; }
+
+/* Feedback banner */
+.feedback-banner {
+  border-radius: 8px;
+  padding: 12px 18px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.5;
+  display: none;
+  margin-bottom: 10px;
+  border: 1.5px solid transparent;
+}
+.feedback-banner.show { display: block; }
+.feedback-banner.correct {
+  background: rgba(46,204,113,0.12);
+  border-color: var(--green);
+  color: #b0ffcc;
+}
+.feedback-banner.wrong {
+  background: rgba(231,76,60,0.12);
+  border-color: var(--red);
+  color: #ffb0a8;
+}
+.feedback-banner.partial {
+  background: rgba(241,196,15,0.1);
+  border-color: var(--yellow);
+  color: #ffe47a;
+}
+
+/* Score display */
+.score-display {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  padding: 6px 0;
+  flex-wrap: wrap;
+}
+.score-chip {
+  font-size: 0.82rem;
+  font-weight: 800;
+  padding: 5px 16px;
+  border-radius: 20px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  color: var(--subtext);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.3s;
+}
+.score-chip.earned { border-color: var(--green); color: var(--green); background: rgba(46,204,113,0.1); }
+.score-chip .score-num {
+  font-family: 'Fredoka One', sans-serif;
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+/* Legend */
+.legend-row {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 8px 0 6px;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+.leg { display: flex; align-items: center; gap: 7px; }
+.leg-dot-i { width: 12px; height: 12px; border-radius: 50%; background: var(--dot-color); flex-shrink: 0; }
+.leg-cross-i {
+  width: 12px; height: 12px; position: relative; flex-shrink: 0;
+}
+.leg-cross-i::before, .leg-cross-i::after {
+  content: '';
+  position: absolute;
+  width: 2px; height: 10px;
+  background: var(--cross-color);
+  left: 5px; top: 1px;
+  border-radius: 1px;
+}
+.leg-cross-i::before { transform: rotate(45deg); }
+.leg-cross-i::after { transform: rotate(-45deg); }
+
+/* Next / reset buttons */
+.btn-row {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 8px 0;
+}
+.btn {
+  font-family: 'Fredoka One', sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.5px;
+  padding: 11px 28px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-next {
+  background: linear-gradient(135deg, #e8a020, #c07000);
+  color: #000;
+  box-shadow: 0 4px 14px rgba(232,160,32,0.3);
+}
+.btn-next:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(232,160,32,0.45); }
+.btn-next:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.btn-reset {
+  background: var(--surface);
+  color: var(--subtext);
+  border: 1.5px solid var(--border);
+}
+.btn-reset:hover { border-color: var(--border-bright); color: var(--text); }
+
+/* Result screen */
+.result-screen {
+  display: none;
+  text-align: center;
+  padding: 30px 20px;
+}
+.result-screen.show { display: block; }
+.result-title {
+  font-family: 'Fredoka One', sans-serif;
+  font-size: 2.2rem;
+  background: linear-gradient(135deg, #ffc040, #2ecc71);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+}
+.result-score {
+  font-family: 'Fredoka One', sans-serif;
+  font-size: 3.5rem;
+  color: var(--green);
+  line-height: 1;
+}
+.result-sub { color: var(--subtext); font-size: 0.9rem; margin: 6px 0 18px; }
+.result-breakdown {
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  max-width: 500px;
+  margin: 0 auto 18px;
+  text-align: left;
+}
+.rb-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+.rb-row:last-child { border-bottom: none; }
+.rb-score { font-family: 'Fredoka One', sans-serif; font-size: 1.1rem; }
+.rb-score.full { color: var(--green); }
+.rb-score.part { color: var(--yellow); }
+.rb-score.zero { color: var(--red); }
+
+/* Dragging ghost */
+#drag-ghost {
+  position: fixed;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: var(--dot-color);
+  box-shadow: 0 0 16px rgba(255,184,48,0.9);
+  pointer-events: none;
+  z-index: 9999;
+  display: none;
+  transform: translate(-50%, -50%);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .atoms-container { gap: 10px; }
+}
+</style>
+</head>
+<body>
+
+<div id="drag-ghost"></div>
+
+<div class="header">
+  <h1>🧪 Ionic Bonding Assessment</h1>
+  <p>Dot & Cross Diagrams — Build the correct ionic structure by moving electrons</p>
+</div>
+
+<div class="compound-tabs">
+  <button class="ctab active" onclick="selectCompound(0)">MgCl₂</button>
+  <button class="ctab" onclick="selectCompound(1)">AlF₃</button>
+</div>
+
+<div class="progress-row" id="progressRow"></div>
+
+<div class="canvas-wrap">
+  <!-- Q1: Atom counting -->
+  <div class="question-card" id="q1card">
+    <div class="q-label"><span class="q-badge">Q1</span> ATOM COUNT</div>
+    <div class="question-text" id="q1text">How many atoms of each element are needed to form <span id="compoundSpan">MgCl₂</span>?</div>
+    <div style="display:flex; align-items:flex-end; gap:16px; flex-wrap:wrap;">
+      <div class="atom-counter" id="atomCounter"></div>
+      <button class="check-btn" id="checkAtomBtn" onclick="checkAtomCount()">Check ✓</button>
+    </div>
+    <div class="counter-feedback" id="atomFeedback"></div>
+  </div>
+
+  <!-- Legend -->
+  <div class="legend-row">
+    <div class="leg"><div class="leg-dot-i"></div><span style="color:var(--metal-text)">● Electrons from metal</span></div>
+    <div class="leg"><div class="leg-cross-i"></div><span style="color:var(--non-text)">✕ Electrons from non-metal</span></div>
+    <div class="leg"><span style="color:var(--ion-text)">✦ Transferred electron (dot in non-metal shell)</span></div>
+  </div>
+
+  <!-- Q2: Draw dot-and-cross / drag electrons -->
+  <div class="dxstage" id="q2stage">
+    <div class="dxstage-title">
+      <span><span class="q-badge" style="background:var(--non-border);color:#fff;">Q2</span>&nbsp; DRAG ELECTRONS — build the dot & cross diagram</span>
+      <span class="dxstage-hint" id="dxhint">First answer Q1 correctly</span>
+    </div>
+    <div class="atoms-container" id="atomsContainer"></div>
+  </div>
+
+  <!-- Feedback -->
+  <div class="feedback-banner" id="feedbackBanner"></div>
+
+  <!-- Score -->
+  <div class="score-display" id="scoreDisplay"></div>
+
+  <!-- Buttons -->
+  <div class="btn-row">
+    <button class="btn btn-next" id="submitBtn" onclick="submitAnswer()" disabled>Submit Answer</button>
+    <button class="btn btn-reset" onclick="resetCurrent()">↺ Try Again</button>
+    <button class="btn btn-next" id="nextCompBtn" onclick="nextCompound()" style="display:none;">Next Compound →</button>
+  </div>
+
+  <!-- Result screen -->
+  <div class="result-screen" id="resultScreen">
+    <div class="result-title">Assessment Complete! 🎉</div>
+    <div class="result-score" id="finalScore">0/8</div>
+    <div class="result-sub">Total marks</div>
+    <div class="result-breakdown" id="resultBreakdown"></div>
+    <button class="btn btn-next" onclick="restartAll()" style="margin-top:8px;">↺ Start Again</button>
+  </div>
+</div>
+
+<script>
+// ─── Compound Definitions ────────────────────────────────────────────────────
+const COMPOUNDS = [
+  {
+    name: 'MgCl₂',
+    fullName: 'Magnesium Chloride',
+    metal: { sym: 'Mg', name: 'Magnesium', outerE: 2, charge: 2, shellR: 70, nucR: 22 },
+    non:   { sym: 'Cl', name: 'Chlorine',  outerE: 7, charge: 1, shellR: 64, nucR: 20 },
+    correctMetal: 1,
+    correctNon: 2,
+    eTrans: 1, // electrons per non-metal atom
+    totalE: 2, // total electrons transferred
+    description: '1 Mg atom loses 2 electrons — 1 to each Cl atom',
+    ionCharge: { metal: '2+', non: '1−' }
+  },
+  {
+    name: 'AlF₃',
+    fullName: 'Aluminium Fluoride',
+    metal: { sym: 'Al', name: 'Aluminium', outerE: 3, charge: 3, shellR: 70, nucR: 22 },
+    non:   { sym: 'F',  name: 'Fluorine',  outerE: 7, charge: 1, shellR: 60, nucR: 18 },
+    correctMetal: 1,
+    correctNon: 3,
+    eTrans: 1,
+    totalE: 3,
+    description: '1 Al atom loses 3 electrons — 1 to each F atom',
+    ionCharge: { metal: '3+', non: '1−' }
+  }
+];
+
+// ─── State ───────────────────────────────────────────────────────────────────
+let currentIdx = 0;
+let metalCount = 1;
+let nonCount = 1;
+let atomCountCorrect = false;
+let scores = [{ atomCount: 0, transfer: 0, ions: 0 }, { atomCount: 0, transfer: 0, ions: 0 }];
+let completedCompounds = [false, false];
+
+// Electron drag state
+let dragEl = null;
+let dragOriginShell = null;
+let transferredMap = {}; // nonAtomIdx -> count of dots received
+let electronElements = []; // { el, shellIdx (metal=0,non=1..N), eIdx }
+
+// ─── Init ────────────────────────────────────────────────────────────────────
+function init() {
+  buildProgressRow();
+  buildAtomCounter();
+  renderAtomDiagram();
+  updateProgressRow();
+  document.getElementById('submitBtn').disabled = true;
+}
+
+function selectCompound(idx) {
+  currentIdx = idx;
+  metalCount = 1;
+  nonCount = 1;
+  atomCountCorrect = false;
+  transferredMap = {};
+  electronElements = [];
+  document.querySelectorAll('.ctab').forEach((b,i) => b.classList.toggle('active', i===idx));
+  document.getElementById('feedbackBanner').className = 'feedback-banner';
+  document.getElementById('nextCompBtn').style.display = 'none';
+  document.getElementById('submitBtn').disabled = true;
+  document.getElementById('atomFeedback').className = 'counter-feedback';
+  document.getElementById('checkAtomBtn').className = 'check-btn';
+  document.getElementById('resultScreen').className = 'result-screen';
+  buildAtomCounter();
+  renderAtomDiagram();
+  updateProgressRow();
+  document.getElementById('dxhint').textContent = 'First answer Q1 correctly';
+}
+
+// ─── Progress ────────────────────────────────────────────────────────────────
+function buildProgressRow() {
+  const row = document.getElementById('progressRow');
+  row.innerHTML = '';
+  ['Atom Count','Electron Transfer','Ion Formation','Score'].forEach((s,i) => {
+    const d = document.createElement('div');
+    d.className = 'prog-step';
+    d.id = 'ps-' + i;
+    d.innerHTML = `<div class="pnum">${i+1}</div>${s}`;
+    row.appendChild(d);
+  });
+}
+
+function updateProgressRow() {
+  const C = COMPOUNDS[currentIdx];
+  const allTransferred = getTotalTransferred() === C.totalE;
+  document.querySelectorAll('.prog-step').forEach((el, i) => {
+    el.classList.remove('active','done');
+    if (i === 0) {
+      if (atomCountCorrect) el.classList.add('done');
+      else el.classList.add('active');
+    } else if (i === 1) {
+      if (!atomCountCorrect) return;
+      if (allTransferred) el.classList.add('done');
+      else el.classList.add('active');
+    } else if (i === 2) {
+      if (!allTransferred) return;
+      el.classList.add('active');
+    }
+  });
+}
+
+// ─── Q1: Atom Counter ─────────────────────────────────────────────────────────
+function buildAtomCounter() {
+  const C = COMPOUNDS[currentIdx];
+  document.getElementById('compoundSpan').textContent = C.name;
+  document.getElementById('q1text').innerHTML = `How many atoms of each element are needed to form <span id="compoundSpan" style="color:var(--metal-text)">${C.name}</span>?`;
+
+  const ctr = document.getElementById('atomCounter');
+  ctr.innerHTML = '';
+  metalCount = 1; nonCount = 1;
+
+  // Metal counter
+  const mg = makeCounter('metalGroup', C.metal.sym + ' (' + C.metal.name + ')', 'metal-lbl', 'metalVal',
+    () => { metalCount = Math.max(1, metalCount - 1); updateCounterVal('metalVal', metalCount); },
+    () => { metalCount = Math.min(4, metalCount + 1); updateCounterVal('metalVal', metalCount); },
+    metalCount);
+  ctr.appendChild(mg);
+
+  // Non-metal counter
+  const ng = makeCounter('nonGroup', C.non.sym + ' (' + C.non.name + ')', 'non-lbl', 'nonVal',
+    () => { nonCount = Math.max(1, nonCount - 1); updateCounterVal('nonVal', nonCount); },
+    () => { nonCount = Math.min(4, nonCount + 1); updateCounterVal('nonVal', nonCount); },
+    nonCount);
+  ctr.appendChild(ng);
+
+  const hint = document.createElement('div');
+  hint.style.cssText = 'font-size:0.78rem;color:var(--subtext);align-self:center;max-width:180px;line-height:1.4;';
+  hint.textContent = 'Think about how many electrons each atom gives/takes to balance charges.';
+  ctr.appendChild(hint);
+}
+
+function makeCounter(id, label, lblCls, valId, onMinus, onPlus, val) {
+  const g = document.createElement('div');
+  g.className = 'counter-group';
+  g.id = id;
+  g.innerHTML = `
+    <div class="counter-label ${lblCls}">${label}</div>
+    <div class="counter-ctrl">
+      <button class="counter-btn" onclick="(${onMinus.toString()})(); renderAtomDiagram()">−</button>
+      <div class="counter-val" id="${valId}">${val}</div>
+      <button class="counter-btn" onclick="(${onPlus.toString()})(); renderAtomDiagram()">+</button>
+    </div>
+    <div class="counter-hint">Number of atoms</div>
+  `;
+  return g;
+}
+
+function updateCounterVal(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = val;
+}
+
+function checkAtomCount() {
+  const C = COMPOUNDS[currentIdx];
+  const fb = document.getElementById('atomFeedback');
+  const btn = document.getElementById('checkAtomBtn');
+  if (metalCount === C.correctMetal && nonCount === C.correctNon) {
+    fb.className = 'counter-feedback correct';
+    fb.textContent = `✓ Correct! ${C.correctMetal} ${C.metal.sym} + ${C.correctNon} ${C.non.sym} — charges balance: ${C.correctMetal}×${C.metal.charge}+ = ${C.correctNon}×${C.eTrans}−`;
+    atomCountCorrect = true;
+    scores[currentIdx].atomCount = 2;
+    btn.className = 'check-btn success';
+    btn.textContent = '✓ Correct!';
+    document.getElementById('dxhint').textContent = '🖱 Drag the ● dot electrons from ' + C.metal.sym + ' onto each ' + C.non.sym + ' shell';
+    document.getElementById('submitBtn').disabled = false;
+    renderAtomDiagram();
+  } else {
+    fb.className = 'counter-feedback wrong';
+    const hint = metalCount !== C.correctMetal
+      ? `${C.metal.sym} has ${C.metal.charge} outer electrons. ${C.non.sym} needs ${C.eTrans} electron. How many ${C.non.sym} atoms are needed?`
+      : `${C.non.sym} can only accept ${C.eTrans} electron. How many are needed for ${C.metal.charge} electrons from ${C.metal.sym}?`;
+    fb.textContent = `✗ Not quite. ${hint}`;
+    scores[currentIdx].atomCount = 0;
+  }
+  updateProgressRow();
+}
+
+// ─── Render Atom Diagram ──────────────────────────────────────────────────────
+function renderAtomDiagram() {
+  const C = COMPOUNDS[currentIdx];
+  const container = document.getElementById('atomsContainer');
+  container.innerHTML = '';
+  transferredMap = {};
+  electronElements = [];
+
+  const shellSize = (r) => r * 2 + 30;
+
+  // ── Metal atom(s) ──
+  for (let mi = 0; mi < metalCount; mi++) {
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;';
+
+    const size = shellSize(C.metal.shellR);
+    const shell = document.createElement('div');
+    shell.className = 'atom-shell metal-atom';
+    shell.style.cssText = `width:${size}px;height:${size}px;`;
+    shell.dataset.atomType = 'metal';
+    shell.dataset.atomIdx = mi;
+
+    // Nucleus
+    const nuc = document.createElement('div');
+    nuc.className = 'atom-nucleus';
+    nuc.style.cssText = `width:${C.metal.nucR*2}px;height:${C.metal.nucR*2}px;font-size:${C.metal.nucR*0.85}px;`;
+    nuc.textContent = C.metal.sym;
+    shell.appendChild(nuc);
+
+    // Outer electrons (dots) — only shown when atomCountCorrect
+    if (atomCountCorrect) {
+      placeElectronsOnShell(shell, C.metal.outerE, C.metal.shellR, 'dot', `metal-${mi}`, true);
+    } else {
+      placeElectronsOnShell(shell, C.metal.outerE, C.metal.shellR, 'dot', `metal-${mi}`, false);
+    }
+
+    wrap.appendChild(shell);
+    const lbl = document.createElement('div');
+    lbl.className = 'atom-label-below metal-lbl-b';
+    lbl.textContent = C.metal.sym + (metalCount > 1 ? ' #'+(mi+1) : '') + ' [' + getOuterConfig(C.metal) + ']';
+    wrap.appendChild(lbl);
+    container.appendChild(wrap);
+  }
+
+  // Arrow
+  if (metalCount > 0 && nonCount > 0) {
+    const arr = document.createElement('div');
+    arr.style.cssText = 'display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 6px;gap:4px;';
+    arr.innerHTML = `
+      <svg width="50" height="30" viewBox="0 0 50 30">
+        <line x1="4" y1="15" x2="38" y2="15" stroke="#ffc040" stroke-width="2.5" stroke-dasharray="5,3"/>
+        <polygon points="38,9 48,15 38,21" fill="#ffc040"/>
+      </svg>
+      <div style="font-size:0.65rem;color:#ffc040;font-weight:700;letter-spacing:1px;">e⁻ transfer</div>`;
+    container.appendChild(arr);
+  }
+
+  // ── Non-metal atom(s) ──
+  for (let ni = 0; ni < nonCount; ni++) {
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;';
+
+    const size = shellSize(C.non.shellR);
+    const shell = document.createElement('div');
+    shell.className = 'atom-shell non-atom';
+    shell.style.cssText = `width:${size}px;height:${size}px;`;
+    shell.dataset.atomType = 'non';
+    shell.dataset.atomIdx = ni;
+    shell.id = `non-shell-${ni}`;
+    transferredMap[ni] = 0;
+
+    // Drop zone behaviour
+    if (atomCountCorrect) {
+      shell.addEventListener('dragover', e => { e.preventDefault(); shell.classList.add('drop-target'); });
+      shell.addEventListener('dragleave', () => shell.classList.remove('drop-target'));
+      shell.addEventListener('drop', (e) => handleDrop(e, ni));
+    }
+
+    // Nucleus
+    const nuc = document.createElement('div');
+    nuc.className = 'atom-nucleus';
+    nuc.style.cssText = `width:${C.non.nucR*2}px;height:${C.non.nucR*2}px;font-size:${C.non.nucR*0.85}px;`;
+    nuc.textContent = C.non.sym;
+    shell.appendChild(nuc);
+
+    // Crosses (non-metal own electrons)
+    placeElectronsOnShell(shell, C.non.outerE, C.non.shellR, 'cross', `non-${ni}`, false);
+
+    wrap.appendChild(shell);
+    const lbl = document.createElement('div');
+    lbl.className = 'atom-label-below non-lbl-b';
+    lbl.id = `non-lbl-${ni}`;
+    lbl.textContent = C.non.sym + (nonCount > 1 ? ' #'+(ni+1) : '') + ' [' + getOuterConfig(C.non) + ']';
+    wrap.appendChild(lbl);
+    container.appendChild(wrap);
+  }
+}
+
+function getOuterConfig(atom) {
+  return atom.sym === 'Mg' ? '2,8,2' :
+         atom.sym === 'Cl' ? '2,8,7' :
+         atom.sym === 'Al' ? '2,8,3' :
+         atom.sym === 'F'  ? '2,7'   : '?';
+}
+
+// ─── Place electrons on shell ──────────────────────────────────────────────
+// 8 positions around the shell edge, 2 per side (paired style for outer shell)
+const POSITIONS_8 = [
+  [0, -1], [0.707, -0.707], [1, 0], [0.707, 0.707],
+  [0, 1], [-0.707, 0.707], [-1, 0], [-0.707, -0.707]
+];
+
+function placeElectronsOnShell(shell, count, shellR, type, key, draggable) {
+  const size = shellR * 2 + 30;
+  const cx = size / 2, cy = size / 2;
+  const er = shellR + 2; // electrons sit just on the ring
+
+  for (let i = 0; i < count; i++) {
+    const [dx, dy] = POSITIONS_8[i % 8];
+    const ex = cx + dx * er;
+    const ey = cy + dy * er;
+
+    const e = document.createElement('div');
+    e.className = 'shell-electron ' + (type === 'dot' ? 'dot-e' : 'cross-e');
+    e.style.cssText = `left:${ex - 7}px;top:${ey - 7}px;`;
+
+    if (draggable && type === 'dot') {
+      e.draggable = true;
+      e.dataset.key = key;
+      e.dataset.eIdx = i;
+      e.addEventListener('dragstart', handleDragStart);
+      e.addEventListener('dragend', handleDragEnd);
+      // Touch support
+      e.addEventListener('touchstart', handleTouchStart, {passive: false});
+      e.addEventListener('touchmove', handleTouchMove, {passive: false});
+      e.addEventListener('touchend', handleTouchEnd);
+    }
+    shell.appendChild(e);
+  }
+}
+
+// ─── Drag & Drop ─────────────────────────────────────────────────────────────
+let currentDragEl = null;
+let currentDragKey = null;
+let currentDragIdx = null;
+
+function handleDragStart(e) {
+  currentDragEl = e.target;
+  currentDragKey = e.target.dataset.key;
+  currentDragIdx = parseInt(e.target.dataset.eIdx);
+  e.target.style.opacity = '0.4';
+  e.dataTransfer.effectAllowed = 'move';
+}
+function handleDragEnd(e) {
+  e.target.style.opacity = '1';
+  document.querySelectorAll('.non-atom').forEach(s => s.classList.remove('drop-target'));
+}
+
+function handleDrop(e, nonIdx) {
+  e.preventDefault();
+  const shell = document.getElementById(`non-shell-${nonIdx}`);
+  shell.classList.remove('drop-target');
+
+  const C = COMPOUNDS[currentIdx];
+  if (transferredMap[nonIdx] >= C.eTrans) {
+    showTempMsg('This atom already has enough electrons!', 'wrong');
+    return;
+  }
+  // Check source metal has electrons left
+  if (!currentDragEl) return;
+
+  // Hide the dragged electron from metal shell
+  currentDragEl.style.display = 'none';
+  currentDragEl.draggable = false;
+
+  // Add a dot to the non-metal shell
+  addDotToNonShell(nonIdx);
+  transferredMap[nonIdx]++;
+
+  checkAllTransferred();
+  updateProgressRow();
+}
+
+function addDotToNonShell(nonIdx) {
+  const C = COMPOUNDS[currentIdx];
+  const shell = document.getElementById(`non-shell-${nonIdx}`);
+  const size = C.non.shellR * 2 + 30;
+  const cx = size / 2, cy = size / 2;
+  const er = C.non.shellR + 2;
+  const occupied = C.non.outerE + transferredMap[nonIdx];
+  const posIdx = occupied % 8;
+
+  // For octet: place transferred dot next to position
+  // Position: slot 7 (top-left) since 7 crosses take slots 0-6, slot 7 free
+  const slotMap = {
+    7: 7, // 7 crosses in 0-6, dot goes to 7
+    6: 7, // only for our case
+  };
+  const slot = 8 - (C.eTrans - transferredMap[nonIdx] + 1); // fill from slot 7 down
+  const realSlot = Math.min(7, C.non.outerE + (transferredMap[nonIdx]));
+  const [dx, dy] = POSITIONS_8[realSlot % 8];
+
+  const ex = cx + dx * er;
+  const ey = cy + dy * er;
+
+  const e = document.createElement('div');
+  e.className = 'shell-electron dot-e transferred';
+  e.style.cssText = `left:${ex - 7}px;top:${ey - 7}px;`;
+  e.style.animation = 'none';
+  shell.appendChild(e);
+
+  // Flash the shell
+  shell.style.boxShadow = '0 0 24px rgba(46,204,113,0.6)';
+  setTimeout(() => { shell.style.boxShadow = ''; }, 600);
+}
+
+function getTotalTransferred() {
+  return Object.values(transferredMap).reduce((a,b) => a+b, 0);
+}
+
+function checkAllTransferred() {
+  const C = COMPOUNDS[currentIdx];
+  const total = getTotalTransferred();
+  const hint = document.getElementById('dxhint');
+
+  if (total === C.totalE) {
+    hint.textContent = '✓ All electrons transferred! Now click Submit Answer.';
+    hint.style.background = 'rgba(46,204,113,0.15)';
+    hint.style.borderColor = 'rgba(46,204,113,0.4)';
+    hint.style.color = 'var(--ion-text)';
+    // Show ion brackets on all atoms
+    showIonBrackets();
+    scores[currentIdx].transfer = 2;
+    scores[currentIdx].ions = 2;
+  } else {
+    const remaining = C.totalE - total;
+    hint.textContent = `${remaining} more electron${remaining > 1 ? 's' : ''} to transfer`;
+  }
+}
+
+function showIonBrackets() {
+  const C = COMPOUNDS[currentIdx];
+  // Add charge labels below non-metal atoms
+  for (let ni = 0; ni < nonCount; ni++) {
+    const lbl = document.getElementById(`non-lbl-${ni}`);
+    if (lbl) {
+      lbl.innerHTML = `<span style="color:var(--ion-text);font-size:0.85rem;">${C.non.sym}⁻ &nbsp;[2,8,8] achieved ✓</span>`;
+    }
+    const shell = document.getElementById(`non-shell-${ni}`);
+    if (shell) shell.classList.add('correct-shell');
+  }
+  // Metal label
+  const mLbl = document.querySelector('.atom-label-below.metal-lbl-b');
+  if (mLbl) {
+    const newConfig = C.metal.sym === 'Mg' ? '[2,8]' : '[2,8]';
+    mLbl.innerHTML = `<span style="color:var(--ion-text);font-size:0.85rem;">${C.metal.sym}${C.metal.charge}⁺ &nbsp;${newConfig} achieved ✓</span>`;
+    mLbl.parentElement.querySelector('.atom-shell').classList.add('correct-shell');
+  }
+}
+
+// ─── Touch drag support ───────────────────────────────────────────────────────
+let touchEl = null, touchOffX = 0, touchOffY = 0;
+const ghost = document.getElementById('drag-ghost');
+
+function handleTouchStart(e) {
+  e.preventDefault();
+  const t = e.touches[0];
+  touchEl = e.target;
+  currentDragEl = touchEl;
+  currentDragKey = touchEl.dataset.key;
+  currentDragIdx = parseInt(touchEl.dataset.eIdx);
+  touchEl.style.opacity = '0.4';
+  ghost.style.display = 'block';
+  ghost.style.left = t.clientX + 'px';
+  ghost.style.top = t.clientY + 'px';
+}
+function handleTouchMove(e) {
+  e.preventDefault();
+  const t = e.touches[0];
+  ghost.style.left = t.clientX + 'px';
+  ghost.style.top = t.clientY + 'px';
+  // Highlight drop targets
+  document.querySelectorAll('.non-atom').forEach(s => {
+    const r = s.getBoundingClientRect();
+    const over = t.clientX >= r.left && t.clientX <= r.right && t.clientY >= r.top && t.clientY <= r.bottom;
+    s.classList.toggle('drop-target', over);
+  });
+}
+function handleTouchEnd(e) {
+  ghost.style.display = 'none';
+  if (touchEl) touchEl.style.opacity = '1';
+  const t = e.changedTouches[0];
+  document.querySelectorAll('.non-atom').forEach(s => {
+    s.classList.remove('drop-target');
+    const r = s.getBoundingClientRect();
+    if (t.clientX >= r.left && t.clientX <= r.right && t.clientY >= r.top && t.clientY <= r.bottom) {
+      handleDrop({ preventDefault: () => {} }, parseInt(s.dataset.atomIdx));
+    }
+  });
+  touchEl = null;
+  currentDragEl = null;
+}
+
+// ─── Submit ───────────────────────────────────────────────────────────────────
+function submitAnswer() {
+  const C = COMPOUNDS[currentIdx];
+  const total = getTotalTransferred();
+  const fb = document.getElementById('feedbackBanner');
+  const scoreDisp = document.getElementById('scoreDisplay');
+  const s = scores[currentIdx];
+  let msg = '';
+  let cls = '';
+
+  if (!atomCountCorrect) {
+    fb.className = 'feedback-banner show wrong';
+    fb.textContent = '✗ Please answer Q1 (atom count) correctly first!';
+    return;
+  }
+
+  if (total === C.totalE) {
+    cls = 'correct';
+    msg = `✓ Excellent! You correctly transferred ${C.totalE} electron${C.totalE>1?'s':''} from ${C.metal.sym} to ${C.non.sym}. ` +
+          `${C.metal.sym} becomes ${C.metal.sym}${C.metal.charge === 1 ? '⁺' : C.metal.charge+'⁺'} (loses outer shell, gets smaller). ` +
+          `Each ${C.non.sym} becomes ${C.non.sym}⁻ (gains 1 electron, gets slightly larger, achieves full octet [2,8,8]). ` +
+          `Charge balance: ${metalCount}×${C.metal.charge}+ = ${nonCount}×1− ✓`;
+  } else if (total > 0) {
+    cls = 'partial';
+    msg = `⚠ Partially correct — you transferred ${total} of ${C.totalE} electrons. ` +
+          `${C.metal.sym} needs to lose all ${C.metal.charge} outer electrons, one to each ${C.non.sym} atom. Try again!`;
+    s.transfer = 1;
+    s.ions = 0;
+  } else {
+    cls = 'wrong';
+    msg = `✗ No electrons transferred yet. Drag the ● dot electrons from ${C.metal.sym} onto each ${C.non.sym} shell.`;
+    s.transfer = 0;
+    s.ions = 0;
+  }
+
+  fb.className = 'feedback-banner show ' + cls;
+  fb.innerHTML = msg;
+
+  // Score display
+  const total_s = s.atomCount + s.transfer + s.ions;
+  scoreDisp.innerHTML = `
+    <div class="score-chip ${s.atomCount>0?'earned':''}"><span class="score-num">${s.atomCount}/2</span> Atom Count</div>
+    <div class="score-chip ${s.transfer>0?'earned':''}"><span class="score-num">${s.transfer}/2</span> Electron Transfer</div>
+    <div class="score-chip ${s.ions>0?'earned':''}"><span class="score-num">${s.ions}/2</span> Ion Formation</div>
+    <div class="score-chip ${total_s>=4?'earned':''}"><span class="score-num">${total_s}/6</span> TOTAL</div>
+  `;
+
+  if (total === C.totalE) {
+    completedCompounds[currentIdx] = true;
+    document.getElementById('submitBtn').disabled = true;
+    // Show next compound or finish
+    if (!completedCompounds.every(Boolean)) {
+      document.getElementById('nextCompBtn').style.display = 'inline-block';
+    } else {
+      showFinalResult();
+    }
+  }
+}
+
+function showTempMsg(txt, cls) {
+  const fb = document.getElementById('feedbackBanner');
+  fb.className = 'feedback-banner show ' + cls;
+  fb.textContent = txt;
+  setTimeout(() => { if (fb.textContent === txt) fb.className = 'feedback-banner'; }, 2000);
+}
+
+// ─── Result screen ─────────────────────────────────────────────────────────────
+function showFinalResult() {
+  const total = scores.reduce((a, s) => a + s.atomCount + s.transfer + s.ions, 0);
+  const max = 12;
+  document.getElementById('finalScore').textContent = total + '/' + max;
+  const breakdown = document.getElementById('resultBreakdown');
+  breakdown.innerHTML = '';
+  COMPOUNDS.forEach((C, i) => {
+    const s = scores[i];
+    const t = s.atomCount + s.transfer + s.ions;
+    const cls = t >= 5 ? 'full' : t >= 3 ? 'part' : 'zero';
+    breakdown.innerHTML += `
+      <div class="rb-row">
+        <span>${C.name} — Atom Count</span>
+        <span class="rb-score ${s.atomCount===2?'full':s.atomCount===1?'part':'zero'}">${s.atomCount}/2</span>
+      </div>
+      <div class="rb-row">
+        <span>${C.name} — Electron Transfer</span>
+        <span class="rb-score ${s.transfer===2?'full':s.transfer===1?'part':'zero'}">${s.transfer}/2</span>
+      </div>
+      <div class="rb-row">
+        <span>${C.name} — Ion Formation</span>
+        <span class="rb-score ${s.ions===2?'full':s.ions===1?'part':'zero'}">${s.ions}/2</span>
+      </div>`;
+  });
+  document.getElementById('resultScreen').className = 'result-screen show';
+  document.getElementById('q1card').style.display = 'none';
+  document.getElementById('q2stage').style.display = 'none';
+  document.getElementById('feedbackBanner').style.display = 'none';
+  document.getElementById('scoreDisplay').style.display = 'none';
+  document.querySelector('.btn-row').style.display = 'none';
+  document.querySelector('.legend-row').style.display = 'none';
+  document.querySelector('.progress-row').style.display = 'none';
+}
+
+// ─── Nav ──────────────────────────────────────────────────────────────────────
+function nextCompound() {
+  const next = completedCompounds.findIndex(c => !c);
+  if (next >= 0) selectCompound(next);
+  document.getElementById('nextCompBtn').style.display = 'none';
+}
+
+function resetCurrent() {
+  scores[currentIdx] = { atomCount: 0, transfer: 0, ions: 0 };
+  completedCompounds[currentIdx] = false;
+  selectCompound(currentIdx);
+}
+
+function restartAll() {
+  scores = [{ atomCount: 0, transfer: 0, ions: 0 }, { atomCount: 0, transfer: 0, ions: 0 }];
+  completedCompounds = [false, false];
+  document.getElementById('q1card').style.display = '';
+  document.getElementById('q2stage').style.display = '';
+  document.getElementById('feedbackBanner').style.display = '';
+  document.getElementById('scoreDisplay').style.display = '';
+  document.querySelector('.btn-row').style.display = '';
+  document.querySelector('.legend-row').style.display = '';
+  document.querySelector('.progress-row').style.display = '';
+  document.getElementById('resultScreen').className = 'result-screen';
+  selectCompound(0);
+}
+
+// ─── Boot ────────────────────────────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>
